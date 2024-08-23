@@ -421,5 +421,26 @@ class InstructTokenizerV3(
     def encode_assistant_message(self, message: AssistantMessageType, is_before_last_user_message: bool) -> List[int]:
         """
         Same as V2 but always encode tool history
+
+        is_before_last_user_message is deprecated
         """
-        return super().encode_assistant_message(message, False)
+        curr_tokens = []
+        if message.content:
+            curr_tokens.extend(self.tokenizer.encode(message.content, bos=False, eos=False))
+
+        if message.tool_calls is not None and len(message.tool_calls) > 0:
+            prepared_tool_calls = []
+            for tool_call in message.tool_calls:
+                prepared_tool_calls.append(self._prepare_function_call(tool_call))
+
+            tool_call_str = json.dumps(prepared_tool_calls, ensure_ascii=False)
+            curr_tokens.extend([
+                self.TOOL_CALLS,
+                *self.tokenizer.encode(tool_call_str, bos=False, eos=False),
+            ])
+        if not curr_tokens:
+            raise TokenizerException(f"Invalid assistant message: {message.content}")
+
+        if not message.prefix:
+            curr_tokens.append(self.tokenizer.eos_id)
+        return curr_tokens
