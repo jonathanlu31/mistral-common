@@ -143,10 +143,10 @@ class MistralRequestValidator(Generic[UserMessageType, AssistantMessageType, Too
 
         # Validate that the message has either text or tool_calls
         # but not both and not neither.
-        if bool(message.content) == bool(message.tool_calls):
-            raise InvalidAssistantMessageException(
-                "Assistant message must have either content or tool_calls, but not both."
-            )
+        # if bool(message.content) == bool(message.tool_calls):
+        #     raise InvalidAssistantMessageException(
+        #         "Assistant message must have either content or tool_calls, but not both."
+        #     )
 
         # If we have tool calls, validate them
         if message.tool_calls is not None:
@@ -207,11 +207,11 @@ class MistralRequestValidator(Generic[UserMessageType, AssistantMessageType, Too
 
             if previous_role is not None:
                 if previous_role == Roles.system:
-                    expected_roles = {Roles.user, Roles.assistant, Roles.system}
+                    expected_roles = {Roles.user, Roles.assistant}
                 elif previous_role == Roles.user:
-                    expected_roles = {Roles.assistant, Roles.system, Roles.user}
+                    expected_roles = {Roles.assistant}
                 elif previous_role == Roles.assistant:
-                    expected_roles = {Roles.assistant, Roles.user, Roles.tool}
+                    expected_roles = {Roles.user, Roles.tool}
                 elif previous_role == Roles.tool:
                     expected_roles = {Roles.assistant, Roles.tool}
 
