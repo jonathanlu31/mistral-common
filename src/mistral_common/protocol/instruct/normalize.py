@@ -118,7 +118,7 @@ class InstructRequestNormalizer(
                 for tool_call in message.tool_calls:
                     normalized_tool_call = self._normalize_tool_call(tool_call)
                     tool_calls.append(normalized_tool_call)
-            elif message.content:
+            if message.content:
                 aggregated_content.append(self._aggregate_content_chunks(message.content))
             prefix |= message.prefix
 

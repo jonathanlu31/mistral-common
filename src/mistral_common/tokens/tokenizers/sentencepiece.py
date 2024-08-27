@@ -257,6 +257,8 @@ class InstructTokenizerV2(
         self.BOS = self.tokenizer.get_control_token(SpecialTokens.bos.value)
         self.PREFIX = self.tokenizer.get_control_token(SpecialTokens.prefix.value)
         self.SUFFIX = self.tokenizer.get_control_token(SpecialTokens.suffix.value)
+        self.BEGIN_SYS = self.tokenizer.get_control_token(SpecialTokens.begin_sys.value)
+        self.END_SYS = self.tokenizer.get_control_token(SpecialTokens.end_sys.value)
 
     def encode_user_message(
         self,
@@ -405,6 +407,43 @@ class InstructTokenizerV3(
             "content": self._parse_json_content(tool_message.content),
             "call_id": tool_message.tool_call_id,
         }
+
+    def encode_user_message(
+        self,
+        message: UserMessage,
+        available_tools: Optional[List[Tool]],
+        is_last: bool,
+        is_first: bool,
+        system_prompt: Optional[str] = None,
+    ) -> List[int]:
+        assert message.content is not None
+        assert isinstance(message.content, str), "Message content must be nornmalized"
+        tools_tokens: List[int] = []
+        system_tokens: List[int] = []
+        if is_first and available_tools:
+            tools = [tool.model_dump() for tool in available_tools]
+            tools_json_tokens = self.tokenizer.encode(json.dumps(tools, ensure_ascii=False), bos=False, eos=False)
+            tools_tokens = [
+                self.BEGIN_AVAILABLE_TOOLS,
+                *tools_json_tokens,
+                self.END_AVAILABLE_TOOLS,
+            ]
+
+        if is_first and system_prompt:
+            system_tokens = [
+                self.BEGIN_SYS,
+                *self.tokenizer.encode(system_prompt, bos=False, eos=False),
+                self.END_SYS,
+            ]
+
+        curr_tokens = [
+            *tools_tokens,
+            *system_tokens,
+            self.BEGIN_INST,
+            *self.tokenizer.encode(message.content, bos=False, eos=False),
+            self.END_INST,
+        ]
+        return curr_tokens
 
     def encode_tool_message(self, message: ToolMessage, is_before_last_user_message: bool) -> List[int]:
         """

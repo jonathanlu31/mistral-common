@@ -66,6 +66,8 @@ class Tekkenizer(Tokenizer):
         SpecialTokens.prefix,
         SpecialTokens.middle,
         SpecialTokens.suffix,
+        SpecialTokens.begin_sys,
+        SpecialTokens.end_sys,
     )
     SPECIAL_TOKEN_TEMPLATE = "<SPECIAL_{id}>"
 

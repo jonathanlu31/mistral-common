@@ -20,6 +20,8 @@ class SpecialTokens(str, Enum):
     prefix = "[PREFIX]"
     middle = "[MIDDLE]"
     suffix = "[SUFFIX]"
+    begin_sys = "[SYS_INST]"
+    end_sys = "[/SYS_INST]"
 
 
 class TokenizerVersion(str, Enum):
