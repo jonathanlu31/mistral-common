@@ -54,14 +54,18 @@ pip install mistral-common
 ```
 
 ### From Source
-Alternatively, you can install from source directly. This repo uses poetry as a dependency and virtual environment manager.
+Checkout multi-response-assistant branch
+```
+pip install .
+```
+~~Alternatively, you can install from source directly. This repo uses poetry as a dependency and virtual environment manager.~~
 
-You can install poetry with
+~~You can install poetry with~~
 ```
 pip install poetry
 ```
 
-poetry will set up a virtual environment and install dependencies with the following command:
+~~poetry will set up a virtual environment and install dependencies with the following command:~~
 ```
 poetry install
 ```
