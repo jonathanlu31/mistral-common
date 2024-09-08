@@ -429,18 +429,24 @@ class InstructTokenizerV3(
                 self.END_AVAILABLE_TOOLS,
             ]
 
+        content = message.content
         if is_first and system_prompt:
-            system_tokens = [
-                self.BEGIN_SYS,
-                *self.tokenizer.encode(system_prompt, bos=False, eos=False),
-                self.END_SYS,
-            ]
+            if self.BEGIN_SYS == 0:
+                assert self.END_SYS == 0, self.END_SYS
+                system_tokens = []
+                content = system_prompt + '\n\n' + content
+            else:
+                system_tokens = [
+                    self.BEGIN_SYS,
+                    *self.tokenizer.encode(system_prompt, bos=False, eos=False),
+                    self.END_SYS,
+                ]
 
         curr_tokens = [
             *tools_tokens,
             *system_tokens,
             self.BEGIN_INST,
-            *self.tokenizer.encode(message.content, bos=False, eos=False),
+            *self.tokenizer.encode(content, bos=False, eos=False),
             self.END_INST,
         ]
         return curr_tokens
